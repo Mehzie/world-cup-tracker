@@ -8,10 +8,12 @@ jobs:
   build_and_run:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Gives the action permission to write standings.json back to your repo
+      contents: write # Explicitly allows editing repo files
     steps:
     - name: Checkout repository code
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }} # Uses the built-in system security pass
 
     - name: Set up Python Environment
       uses: actions/setup-python@v5
@@ -27,8 +29,8 @@ jobs:
 
     - name: Commit and Save Live Changes
       run: |
-        git config --local user.email "actions@github.com"
-        git config --local user.name "GitHub Actions Automation"
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
         git add standings.json
         git commit -m "Auto-update: Refreshing third-place tables" || echo "No data modifications detected"
-        git push
+        git push origin main
