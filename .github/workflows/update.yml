@@ -1,0 +1,34 @@
+name: Hourly Live Tracker Update
+on:
+  schedule:
+    - cron: '0 * * * *' # Triggers automatically at the top of every single hour
+  workflow_dispatch: # Gives you a manual button to force an instant sync whenever you want
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Gives the action permission to write standings.json back to your repo
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Python Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Network Libraries
+      run: |
+        pip install requests
+
+    - name: Execute Tracker Script
+      run: python tracker.py
+
+    - name: Commit and Save Live Changes
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions Automation"
+        git add standings.json
+        git commit -m "Auto-update: Refreshing third-place tables" || echo "No data modifications detected"
+        git push
